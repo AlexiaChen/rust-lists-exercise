@@ -13,7 +13,8 @@ pub mod bad_stack {
     impl Stack {
         /// single instance creator
         /// ### Example
-        /// ```rust
+        /// ```rust 
+        /// use mylist::bad_stack::bad_stack::Stack;
         /// let stack = Stack::new();
         /// ```
         pub fn new() -> Self {
@@ -23,6 +24,7 @@ pub mod bad_stack {
         /// push new element to stack
         /// ### Example
         /// ```rust
+        /// use mylist::bad_stack::bad_stack::Stack;
         /// let mut stack = Stack::new();
         /// stack.push(5);
         /// ```
@@ -37,9 +39,10 @@ pub mod bad_stack {
         /// pop element in top of stack
         /// ### Example
         /// ```rust
+        /// use mylist::bad_stack::bad_stack::Stack;
         /// let mut stack = Stack::new();
         /// stack.push(5);
-        /// assert_eq!(new_stack.pop(), Some(5));
+        /// assert_eq!(stack.pop(), Some(5));
         /// ```
         pub fn pop(&mut self) -> Option<i32> {
             match std::mem::replace(&mut self.head, Link::Empty) {
