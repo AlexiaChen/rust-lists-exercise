@@ -20,7 +20,7 @@ pub mod ok_stack {
         pub fn push(&mut self, element: i32) {
             let new_node = Box::new(Node {
                 element: element,
-                next: std::mem::replace(&mut self.head, None)
+                next: self.head.take()
             });
     
             self.head = Some(new_node);
@@ -28,7 +28,7 @@ pub mod ok_stack {
         }
     
         pub fn pop(&mut self) -> Option<i32> {
-            match std::mem::replace(&mut self.head, None) {
+            match self.head.take() {
                 None => None,
                 Some(node) => {
                     self.head = node.next;
@@ -41,9 +41,9 @@ pub mod ok_stack {
     
     impl Drop for Stack {
         fn drop(&mut self) {
-            let mut cur_link = std::mem::replace(&mut self.head, None);
+            let mut cur_link = self.head.take();
             while let Some(mut node) = cur_link {
-                cur_link = std::mem::replace(&mut node.next, None);
+                cur_link = node.next.take();
             }
         }
     }
