@@ -1,4 +1,4 @@
-pub mod stack {
+pub mod bad_stack {
     pub struct Stack {
         head: Link,
     }
@@ -56,7 +56,7 @@ pub mod stack {
 mod tests {
     #[test]
     fn stack_tests() {
-        use super::stack::Stack;
+        use super::bad_stack::Stack;
         let mut new_stack = Stack::new();
 
         assert_eq!(new_stack.pop(), None);
