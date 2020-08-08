@@ -11,9 +11,21 @@ pub mod bad_stack {
         next: Link,
     }
     impl Stack {
+        /// single instance creator
+        /// ### Example
+        /// ```rust
+        /// let stack = Stack::new();
+        /// ```
         pub fn new() -> Self {
             Stack { head: Link::Empty }
         }
+
+        /// push new element to stack
+        /// ### Example
+        /// ```rust
+        /// let mut stack = Stack::new();
+        /// stack.push(5);
+        /// ```
         pub fn push(&mut self, element: i32) {
             let new_node = Box::new(Node {
                 element: element,
@@ -21,6 +33,14 @@ pub mod bad_stack {
             });
             self.head = Link::More(new_node);
         }
+
+        /// pop element in top of stack
+        /// ### Example
+        /// ```rust
+        /// let mut stack = Stack::new();
+        /// stack.push(5);
+        /// assert_eq!(new_stack.pop(), Some(5));
+        /// ```
         pub fn pop(&mut self) -> Option<i32> {
             match std::mem::replace(&mut self.head, Link::Empty) {
                 Link::Empty => None,

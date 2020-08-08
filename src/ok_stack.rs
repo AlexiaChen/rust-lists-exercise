@@ -9,9 +9,21 @@ pub mod ok_stack {
         next: Link<T>,
     }
     impl<T> Stack<T> {
+        /// single instance creator
+        /// ### Example
+        /// ```rust
+        /// let stack = Stack::new();
+        /// ```
         pub fn new() -> Self {
             Stack { head: None }
         }
+
+        /// push new element to stack
+        /// ### Example
+        /// ```rust
+        /// let mut stack = Stack::new();
+        /// stack.push(5);
+        /// ```
         pub fn push(&mut self, element: T) {
             let new_node = Box::new(Node {
                 element: element,
@@ -19,6 +31,14 @@ pub mod ok_stack {
             });
             self.head = Some(new_node);
         }
+
+        /// pop element in top of stack
+        /// ### Example
+        /// ```rust
+        /// let mut stack = Stack::new();
+        /// stack.push(5);
+        /// assert_eq!(new_stack.pop(), Some(5));
+        /// ```
         pub fn pop(&mut self) -> Option<T> {
             self.head.take().map(|node| {
                 self.head = node.next;
