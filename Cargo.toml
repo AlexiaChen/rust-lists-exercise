@@ -7,7 +7,7 @@ edition = "2018"
 [lib]
 name = "mylist"
 crate-type = ["dylib", "rlib", "staticlib"]
-path = "src/lib.rs"
+path = "src/lib/lib.rs"
 
 [[bin]]
 name = "mybin"
