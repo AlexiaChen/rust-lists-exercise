@@ -1,42 +1,32 @@
 pub mod ok_stack {
-    pub struct Stack {
-        head: Link,
+    pub struct Stack<T> {
+        head: Link<T>,
     }
 
-    type Link = Option<Box<Node>>;
-    
-    struct Node {
-        element: i32,
-        next: Link,
+    type Link<T> = Option<Box<Node<T>>>;
+    struct Node<T> {
+        element: T,
+        next: Link<T>,
     }
-    
-    impl Stack {
+    impl<T> Stack<T> {
         pub fn new() -> Self {
-            Stack {
-                head: None
-            }
+            Stack { head: None }
         }
-    
-        pub fn push(&mut self, element: i32) {
+        pub fn push(&mut self, element: T) {
             let new_node = Box::new(Node {
                 element: element,
-                next: self.head.take()
+                next: self.head.take(),
             });
-    
             self.head = Some(new_node);
-    
         }
-    
-        pub fn pop(&mut self) -> Option<i32> {
+        pub fn pop(&mut self) -> Option<T> {
             self.head.take().map(|node| {
                 self.head = node.next;
                 node.element
             })
         }
     }
-    
-    
-    impl Drop for Stack {
+    impl<T> Drop for Stack<T> {
         fn drop(&mut self) {
             let mut cur_link = self.head.take();
             while let Some(mut node) = cur_link {
@@ -51,24 +41,27 @@ mod tests {
     #[test]
     fn stack_tests() {
         use super::ok_stack::Stack;
-        let mut new_stack = Stack::new();
 
-        assert_eq!(new_stack.pop(), None);
+        {
+            let mut new_stack = Stack::new();
 
-        new_stack.push(1);
-        new_stack.push(2);
-        new_stack.push(3);
+            assert_eq!(new_stack.pop(), None);
 
-        assert_eq!(new_stack.pop(), Some(3));
-        assert_eq!(new_stack.pop(), Some(2));
+            new_stack.push(1);
+            new_stack.push(2);
+            new_stack.push(3);
 
-        new_stack.push(4);
-        new_stack.push(5);
+            assert_eq!(new_stack.pop(), Some(3));
+            assert_eq!(new_stack.pop(), Some(2));
 
-        assert_eq!(new_stack.pop(), Some(5));
-        assert_eq!(new_stack.pop(), Some(4));
+            new_stack.push(4);
+            new_stack.push(5);
 
-        assert_eq!(new_stack.pop(), Some(1));
-        assert_eq!(new_stack.pop(), None);
+            assert_eq!(new_stack.pop(), Some(5));
+            assert_eq!(new_stack.pop(), Some(4));
+
+            assert_eq!(new_stack.pop(), Some(1));
+            assert_eq!(new_stack.pop(), None);
+        }
     }
 }
