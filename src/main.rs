@@ -1,3 +1,4 @@
+extern crate mylist; // Optional for Rust 2018 Edition
 
 pub fn main() {
     {
