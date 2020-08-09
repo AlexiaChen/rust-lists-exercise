@@ -1,7 +1,7 @@
-use mylist::bad_stack::Stack;
 
 pub fn main() {
     {
+        use mylist::bad_stack::Stack;
         let mut new_stack = Stack::new();
 
         assert_eq!(new_stack.pop(), None);
@@ -24,7 +24,8 @@ pub fn main() {
     }
 
     {
-        let mut new_stack = mylist::ok_stack::Stack::new();
+        use mylist::ok_stack::Stack;
+        let mut new_stack = Stack::new();
         new_stack.push("hello");
         assert_eq!(new_stack.pop(), Some("hello"));
         assert_eq!(new_stack.pop(), None);
