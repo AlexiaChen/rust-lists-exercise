@@ -1,40 +1,43 @@
-pub mod ok_stack {
-    pub struct Stack<T> {
-        head: Link<T>,
+
+pub struct Stack<T> {
+    head: Link<T>,
+}
+
+type Link<T> = Option<Box<Node<T>>>;
+struct Node<T> {
+    element: T,
+    next: Link<T>,
+}
+
+impl<T> Stack<T> {
+    pub fn new() -> Self {
+        Stack { head: None }
     }
 
-    type Link<T> = Option<Box<Node<T>>>;
-    struct Node<T> {
-        element: T,
-        next: Link<T>,
+    pub fn push(&mut self, element: T) {
+        let new_node = Box::new(Node {
+            element: element,
+            next: self.head.take(),
+        });
+        self.head = Some(new_node);
     }
-    impl<T> Stack<T> {
-       
-        pub fn new() -> Self {
-            Stack { head: None }
-        }
 
-        pub fn push(&mut self, element: T) {
-            let new_node = Box::new(Node {
-                element: element,
-                next: self.head.take(),
-            });
-            self.head = Some(new_node);
-        }
-
-        pub fn pop(&mut self) -> Option<T> {
-            self.head.take().map(|node| {
-                self.head = node.next;
-                node.element
-            })
-        }
+    pub fn pop(&mut self) -> Option<T> {
+        self.head.take().map(|node| {
+            self.head = node.next;
+            node.element
+        })
     }
-    impl<T> Drop for Stack<T> {
-        fn drop(&mut self) {
-            let mut cur_link = self.head.take();
-            while let Some(mut node) = cur_link {
-                cur_link = node.next.take();
-            }
+
+    pub fn peek(&self) -> Option<&T> {
+        self.head.as_ref().map(|node| &node.element)
+    }
+}
+impl<T> Drop for Stack<T> {
+    fn drop(&mut self) {
+        let mut cur_link = self.head.take();
+        while let Some(mut node) = cur_link {
+            cur_link = node.next.take();
         }
     }
 }
@@ -43,7 +46,7 @@ pub mod ok_stack {
 mod tests {
     #[test]
     fn stack_tests() {
-        use super::ok_stack::Stack;
+        use super::Stack;
 
         {
             let mut new_stack = Stack::new();
