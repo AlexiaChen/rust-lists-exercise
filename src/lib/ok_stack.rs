@@ -32,6 +32,12 @@ impl<T> Stack<T> {
     pub fn peek(&self) -> Option<&T> {
         self.head.as_ref().map(|node| &node.element)
     }
+
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
+        self.head.as_mut().map(|node| {
+            &mut node.element
+        })
+    }
 }
 impl<T> Drop for Stack<T> {
     fn drop(&mut self) {
