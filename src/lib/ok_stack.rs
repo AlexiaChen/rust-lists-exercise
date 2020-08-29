@@ -9,10 +9,23 @@ struct Node<T> {
 }
 
 impl<T> Stack<T> {
+    /// single instance creator
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let stack = Stack::<i32>::new();
+    /// ```
     pub fn new() -> Self {
         Stack { head: None }
     }
 
+    /// push new element to stack
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// ```
     pub fn push(&mut self, element: T) {
         let new_node = Box::new(Node {
             element: element,
@@ -21,6 +34,14 @@ impl<T> Stack<T> {
         self.head = Some(new_node);
     }
 
+    /// pop element in top of stack
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// assert_eq!(stack.pop(), Some(5));
+    /// ```
     pub fn pop(&mut self) -> Option<T> {
         self.head.take().map(|node| {
             self.head = node.next;
@@ -28,14 +49,51 @@ impl<T> Stack<T> {
         })
     }
 
+    /// peek a element in top of stack
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// assert_eq!(stack.peek(), Some(&5));
+    /// ```
     pub fn peek(&self) -> Option<&T> {
         self.head.as_ref().map(|node| &node.element)
     }
 
+    /// peek a mutable element in top of stack and you can change it
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// assert_eq!(stack.peek(), Some(&5));
+    /// stack.peek_mut().map(|value| *value = 3);
+    /// assert_eq!(stack.peek(), Some(&3));
+    /// ```
     pub fn peek_mut(&mut self) -> Option<&mut T> {
         self.head.as_mut().map(|node| &mut node.element)
     }
+
+    // declare a fresh lifetime here for the *exact* borrow that
+    // creates the iter. Now &self needs to be valid as long as the
+    // Iter is around.
+    
+    /// return a iter point to head
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// let mut iter = stack.iter();
+    /// assert_eq!(iter.next(), Some(&5));
+    /// ```
+    pub fn iter<'a>(&'a self) -> Iter<'a, T> {
+        Iter { next: self.head.as_ref().map(|node| &**node) }
+    }
 }
+
+// Impl Drop trait for Stack<T>
 impl<T> Drop for Stack<T> {
     fn drop(&mut self) {
         let mut cur_link = self.head.take();
@@ -44,6 +102,25 @@ impl<T> Drop for Stack<T> {
         }
     }
 }
+
+// Iter is generic over *some* lifetime, it doesn't care
+pub struct Iter<'a, T> {
+    next: Option<&'a Node<T>>,
+}
+
+
+// Impl Iterator trait for Iter<T>
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
+            self.next = node.next.as_ref().map(|node| &**node);
+            &node.element
+        })
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -102,5 +179,23 @@ mod tests {
         stack.pop();
         stack.pop();
         assert_eq!(stack.peek(), None);
+
+        stack.push(15);
+        stack.peek_mut().map(|value| *value = 11);
+        assert_eq!(stack.peek(), Some(&11));
+    }
+
+    #[test]
+    fn iter_tests() {
+        use super::Stack;
+        let mut stack = Stack::new();
+        stack.push(1); 
+        stack.push(2); 
+        stack.push(3);
+    
+        let mut iter = stack.iter();
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), Some(&2));
+        assert_eq!(iter.next(), Some(&1));
     }
 }
