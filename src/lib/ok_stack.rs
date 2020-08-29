@@ -1,4 +1,3 @@
-
 pub struct Stack<T> {
     head: Link<T>,
 }
@@ -34,9 +33,7 @@ impl<T> Stack<T> {
     }
 
     pub fn peek_mut(&mut self) -> Option<&mut T> {
-        self.head.as_mut().map(|node| {
-            &mut node.element
-        })
+        self.head.as_mut().map(|node| &mut node.element)
     }
 }
 impl<T> Drop for Stack<T> {
@@ -89,5 +86,21 @@ mod tests {
 
             assert_eq!(new_stack.pop(), None);
         }
+    }
+
+    #[test]
+    fn peek_tests() {
+        use super::Stack;
+        let mut stack = Stack::new();
+        stack.push(5);
+        stack.push(4);
+        stack.push(3);
+        assert_eq!(stack.peek(), Some(&3));
+        stack.pop();
+        assert_eq!(stack.peek(), Some(&4));
+        assert_eq!(stack.peek(), Some(&4));
+        stack.pop();
+        stack.pop();
+        assert_eq!(stack.peek(), None);
     }
 }
