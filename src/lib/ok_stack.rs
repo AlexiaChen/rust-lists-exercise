@@ -78,7 +78,6 @@ impl<T> Stack<T> {
     // declare a fresh lifetime here for the *exact* borrow that
     // creates the iter. Now &self needs to be valid as long as the
     // Iter is around.
-    
     /// return a iter point to head
     /// ### Example
     /// ```rust
@@ -89,7 +88,25 @@ impl<T> Stack<T> {
     /// assert_eq!(iter.next(), Some(&5));
     /// ```
     pub fn iter<'a>(&'a self) -> Iter<'a, T> {
-        Iter { next: self.head.as_ref().map(|node| &**node) }
+        Iter {
+            next: self.head.as_ref().map(|node| &**node),
+        }
+    }
+
+   
+    /// return a mutable iter point to head
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// let mut iter = stack.iter_mut();
+    /// assert_eq!(iter.next(), Some(&mut 5));
+    /// ```
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, T> {
+        IterMut {
+            next: self.head.as_mut().map(|node| &mut **node),
+        }
     }
 }
 
@@ -108,6 +125,9 @@ pub struct Iter<'a, T> {
     next: Option<&'a Node<T>>,
 }
 
+pub struct IterMut<'a, T> {
+    next: Option<&'a mut Node<T>>,
+}
 
 // Impl Iterator trait for Iter<T>
 impl<'a, T> Iterator for Iter<'a, T> {
@@ -121,6 +141,16 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.take().map(|node| {
+            self.next = node.next.as_mut().map(|node| &mut **node);
+            &mut node.element
+        })
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -189,13 +219,21 @@ mod tests {
     fn iter_tests() {
         use super::Stack;
         let mut stack = Stack::new();
-        stack.push(1); 
-        stack.push(2); 
+        stack.push(1);
+        stack.push(2);
         stack.push(3);
-    
         let mut iter = stack.iter();
         assert_eq!(iter.next(), Some(&3));
         assert_eq!(iter.next(), Some(&2));
         assert_eq!(iter.next(), Some(&1));
+
+        let mut iter_mut = stack.iter_mut();
+        iter_mut.next().map(|value| *value = 11);
+        iter_mut.next().map(|value| *value = 12);
+        iter_mut.next().map(|value| *value = 13);
+        iter_mut = stack.iter_mut();
+        assert_eq!(iter_mut.next(), Some(&mut 11));
+        assert_eq!(iter_mut.next(), Some(&mut 12));
+        assert_eq!(iter_mut.next(), Some(&mut 13));
     }
 }
