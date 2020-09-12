@@ -108,6 +108,20 @@ impl<T> Stack<T> {
             next: self.head.as_mut().map(|node| &mut **node),
         }
     }
+
+    /// return a iter point to head
+    /// ### Example
+    /// ```rust
+    /// use mylist::ok_stack::Stack;
+    /// let mut stack = Stack::new();
+    /// stack.push(5);
+    /// let mut iter = stack.into_iter();
+    /// assert_eq!(iter.next(), Some(5));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
 }
 
 // Impl Drop trait for Stack<T>
@@ -149,6 +163,18 @@ impl<'a, T> Iterator for IterMut<'a, T> {
             self.next = node.next.as_mut().map(|node| &mut **node);
             &mut node.element
         })
+    }
+}
+
+// Tuple structs are an alternative form of struct,
+// useful for trivial wrappers around other types.
+pub struct IntoIter<T>(Stack<T>);
+
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = T;
+    fn next(&mut self) ->Option<Self::Item> {
+        self.0.pop()
     }
 }
 
@@ -235,5 +261,19 @@ mod tests {
         assert_eq!(iter_mut.next(), Some(&mut 11));
         assert_eq!(iter_mut.next(), Some(&mut 12));
         assert_eq!(iter_mut.next(), Some(&mut 13));
+    }
+
+    #[test]
+    fn into_iter_tests() {
+        use super::Stack;
+        let mut stack = Stack::new();
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+        let mut iter = stack.into_iter();
+        assert_eq!(iter.next(), Some(3));
+        assert_eq!(iter.next(), Some(2));
+        assert_eq!(iter.next(), Some(1));
+        assert_eq!(iter.next(), None);
     }
 }
