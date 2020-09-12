@@ -93,7 +93,6 @@ impl<T> Stack<T> {
         }
     }
 
-   
     /// return a mutable iter point to head
     /// ### Example
     /// ```rust
@@ -170,10 +169,9 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 // useful for trivial wrappers around other types.
 pub struct IntoIter<T>(Stack<T>);
 
-
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
-    fn next(&mut self) ->Option<Self::Item> {
+    fn next(&mut self) -> Option<Self::Item> {
         self.0.pop()
     }
 }
