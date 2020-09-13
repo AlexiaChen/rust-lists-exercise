@@ -20,7 +20,6 @@ struct Node<T> {
 }
 
 impl<T> List<T> {
-    
     /// single instance creator
     /// ### Example
     /// ```rust
@@ -48,7 +47,7 @@ impl<T> List<T> {
         }
     }
 
-    /// return rest of list except to head 
+    /// return rest of list except to head
     /// ### Example
     /// ```rust
     /// use mylist::persistence_list::List;
@@ -62,7 +61,7 @@ impl<T> List<T> {
             head: self.head.as_ref().and_then(|node| node.next.clone()),
         }
     }
-    
+
     /// return head value of list
     /// ### Example
     /// ```rust
@@ -85,11 +84,13 @@ impl<T> List<T> {
     /// assert_eq!(iter.next(), Some(&3));
     /// ```
     pub fn iter(&self) -> Iter<'_, T> {
-        Iter { next: self.head.as_ref().map(|node| &**node) }
+        Iter {
+            next: self.head.as_ref().map(|node| &**node),
+        }
     }
-    
 }
- 
+
+/// Impl Drop trait for List<T> that using Rerference Counting
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
         let mut head_link = self.head.take();
@@ -142,7 +143,6 @@ mod test {
         // Make sure empty tail works
         let list = list.tail();
         assert_eq!(list.head(), None);
-
     }
 
     #[test]
