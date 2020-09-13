@@ -73,6 +73,36 @@ impl<T> List<T> {
     pub fn head(&self) -> Option<&T> {
         self.head.as_ref().map(|node| &node.element)
     }
+
+    /// return an iter point to head
+    /// ### Example
+    /// ```rust
+    /// use mylist::persistence_list::List;
+    /// let list = List::new();
+    /// let list = list.append(3).append(4);
+    /// let mut iter = list.iter();
+    /// assert_eq!(iter.next(), Some(&4));
+    /// assert_eq!(iter.next(), Some(&3));
+    /// ```
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter { next: self.head.as_ref().map(|node| &**node) }
+    }
+    
+}
+
+pub struct Iter<'a, T> {
+    next: Option<&'a Node<T>>,
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
+            self.next = node.next.as_ref().map(|node| &**node);
+            &node.element
+        })
+    }
 }
 
 #[cfg(test)]
@@ -100,5 +130,15 @@ mod test {
         let list = list.tail();
         assert_eq!(list.head(), None);
 
+    }
+
+    #[test]
+    fn iter_tests() {
+        let list = List::new();
+        let list = list.append(3).append(4);
+        let mut iter = list.iter();
+        assert_eq!(iter.next(), Some(&4));
+        assert_eq!(iter.next(), Some(&3));
+        assert_eq!(iter.next(), None);
     }
 }
